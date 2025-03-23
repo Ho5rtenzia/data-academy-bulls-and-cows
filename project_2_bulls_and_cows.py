@@ -9,6 +9,8 @@ discord: energetic_avocado_65638
 import random
 import time
 
+section_splitter = "-" * 40
+
 
 def unique_four_digit_generation() -> int:
     all_digits = list("0123456789")
@@ -19,6 +21,46 @@ def unique_four_digit_generation() -> int:
     another_digits = random.sample(all_digits, 3)
 
     return int(first_digit + "".join(another_digits))
+
+
+def is_input_valid(user_try: str) -> bool:
+    if len(user_try) != 4:
+        print("Please select exactly 4 digits.")
+        return False
+    elif user_try[0] == "0":
+        print("Your try cannot start with 0.")
+        return False
+    elif not user_try.isdigit():
+        print("Please select digits only (0-9).")
+        return False
+    elif len(set(user_try)) != 4:
+        print("Digits must be unique.")
+        return False
+    else:
+        return True
+
+
+def count_bulls_cows(user_input: str, secret_number: int) -> tuple[int, int]:
+    list_user_input = list(user_input)
+    list_secret_number = list(str(secret_number))
+
+    count_bulls = 0
+    count_cows = 0
+
+    for i in range(len(list_secret_number)):
+        if list_user_input[i] == list_secret_number[i]:
+            count_bulls += 1
+        elif list_user_input[i] in list_secret_number:
+            count_cows += 1
+    return count_bulls, count_cows
+
+
+def introduction_text():
+    print("Hi there!")
+    print(section_splitter)
+    print("I've generated a random 4 digit number for you.")
+    print("Let's play a bulls and cows game.")
+    print(section_splitter)
 
 
 def get_performance_feedback(attempts: int) -> str:
@@ -32,55 +74,23 @@ def get_performance_feedback(attempts: int) -> str:
         return "Keep practicing!"
 
 
-# Random number generation
+introduction_text()
+
 random_four_digits = unique_four_digit_generation()
-
-# TODO: delete at the end, showing secret number
-print(random_four_digits)
-
-section_splitter = "-" * 40
-
-# Introductory text
-print("Hi there!")
-print(section_splitter)
-print("I've generated a random 4 digit number for you.")
-print("Let's play a bulls and cows game.")
-print(section_splitter)
-
 start_time = time.time()
 attempts = 0
+
+# print(random_four_digits)  # Uncomment for testing
+
 
 while True:
     user_try = input("Enter a number:")
     attempts += 1
 
-    # Validation
-    if len(user_try) != 4:
-        print("Please select exactly 4 digits.")
-        continue
-    elif user_try[0] == "0":
-        print("Your try cannot start with 0.")
-        continue
-    elif not user_try.isdigit():
-        print("Please select digits only (0-9).")
-        continue
-    elif len(set(user_try)) != 4:
-        print("Digits must be unique.")
+    if not is_input_valid(user_try):
         continue
 
-    # Input is valid
-    user_input = int(user_try)
-    list_user_input = list(str(user_input))
-    list_secret = list(str(random_four_digits))
-
-    count_bulls = 0
-    count_cows = 0
-
-    for i in range(len(list_secret)):
-        if list_user_input[i] == list_secret[i]:
-            count_bulls += 1
-        elif list_user_input[i] in list_secret:
-            count_cows += 1
+    count_bulls, count_cows = count_bulls_cows(user_try, random_four_digits)
 
     bull_word = "bull" if count_bulls == 1 else "bulls"
     cow_word = "cow" if count_cows == 1 else "cows"
@@ -93,7 +103,7 @@ while True:
 
         print(f"Correct, you've guessed the right number in {attempts} attempts!")
         print(section_splitter)
-        print(f"Time taken {duration}.")
+        print(f"Time taken: {duration} seconds.")
         print(section_splitter)
         print(get_performance_feedback(attempts))
         break
